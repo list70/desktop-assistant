@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+websockets
+faster-whisper
+kokoro>=0.9.4
+misaki[ja]
+soundfile
+numpy
+httpx
+smolagents
+openai
+duckduckgo-search

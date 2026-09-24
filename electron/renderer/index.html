@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Desktop Assistant</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "../node_modules/three/build/three.module.js",
+        "three/addons/": "../node_modules/three/examples/jsm/",
+        "@pixiv/three-vrm": "../node_modules/@pixiv/three-vrm/lib/three-vrm.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="drag-region">
+    <span>AIアシスタント</span>
+    <div class="window-controls">
+      <button id="minimize-btn">_</button>
+      <button id="settings-btn">⚙</button>
+    </div>
+  </div>
+
+  <div id="character-container">
+    <canvas id="character-canvas"></canvas>
+  </div>
+
+  <div id="chat-panel">
+    <div id="status-indicator">
+      <span class="status-dot offline" id="status-dot"></span>
+      <span class="status-text" id="status-text">オフライン</span>
+    </div>
+    
+    <div id="chat-messages">
+      <div id="thinking-indicator" style="display: none;">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+    </div>
+    
+    <div id="input-area">
+      <button id="mic-btn">🎙</button>
+      <input type="text" id="message-input" placeholder="メッセージを入力...">
+      <button id="send-btn">➤</button>
+    </div>
+  </div>
+
+  <script type="module" src="character.js"></script>
+  <script type="module" src="chat.js"></script>
+  <script type="module" src="voice-input.js"></script>
+  <script type="module" src="voice-output.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
