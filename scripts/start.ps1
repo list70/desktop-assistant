@@ -58,6 +58,11 @@ if (-not (Test-Path $venvPython)) {
     Write-Host "  ERROR: Virtual environment not found. Please run .\scripts\setup.ps1 first." -ForegroundColor Red
     exit 1
 }
+& $venvPython --version *> $null
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "  ERROR: The Python environment cannot start. Repair or install Python 3.10 - 3.12, then run .\scripts\setup.ps1." -ForegroundColor Red
+    exit 1
+}
 
 # Reuse a healthy backend. Never terminate an unrelated process occupying this port.
 $backendProcess = $null
