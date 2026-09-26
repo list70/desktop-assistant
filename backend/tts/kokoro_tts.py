@@ -67,6 +67,16 @@ class KokoroTTS:
             return self.emotion_voice_map[emotion]
         return self.voice
 
+    def set_voice(self, voice: str):
+        voice = voice.strip()
+        available_voices = {item["id"] for item in self.list_available_voices()["available_voices"]}
+        if voice not in available_voices:
+            raise ValueError(f"TTS voice must be one of: {', '.join(sorted(available_voices))}")
+        self.voice = voice
+        config.tts_voice = voice
+        self.emotion_voice_map["neutral"] = voice
+        self.emotion_voice_map["thinking"] = voice
+
     def synthesize(
         self,
         text: str,

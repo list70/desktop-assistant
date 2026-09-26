@@ -13,6 +13,16 @@ class WhisperSTT:
         self.compute_type = config.whisper_compute_type
         self.model = None
 
+    def set_model_size(self, model_size: str):
+        model_size = model_size.strip()
+        allowed_sizes = {"tiny", "base", "small", "medium", "large-v3", "large-v3-turbo"}
+        if model_size not in allowed_sizes:
+            raise ValueError(f"Whisper model size must be one of: {', '.join(sorted(allowed_sizes))}")
+        if model_size != self.model_size:
+            self.model = None
+            self.model_size = model_size
+            config.whisper_model_size = model_size
+
     def _load_model(self):
         if self.model is None:
             logger.info(f"Loading Whisper model {self.model_size} on {self.device}...")
@@ -20,9 +30,9 @@ class WhisperSTT:
             logger.info("Whisper model loaded.")
 
     def transcribe(self, audio_bytes: bytes) -> str:
-        self._load_model()
         temp_file = save_temp_audio(audio_bytes)
         try:
+            self._load_model()
             segments, info = self.model.transcribe(
                 temp_file,
                 vad_filter=True,

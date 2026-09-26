@@ -12,7 +12,7 @@
 - 💬 **テキスト入力**: チャット形式でテキスト入力
 - 🔊 **音声出力**: アシスタントが声で返答（Kokoro-82M）
 - 🧍 **3D/2Dキャラクター**: VRMモデルを読み込んで好きなキャラを表示
-- 🧠 **ローカルLLM**: Ollama + Qwen3-8B で完全ローカル推論
+- 🧠 **ローカルLLM**: Ollamaでインストール済みのモデルを選んでローカル推論
 - 🛠️ **エージェント機能**: ファイル操作、Web検索、アプリ起動等を自動実行
 - 🎭 **感情表現**: 応答に応じてキャラクターの表情が変化
 - 👄 **リップシンク**: 音声出力に合わせて口が動く
@@ -34,7 +34,7 @@
 │    Python (バックエンド)          │
 │  ┌──────┐ ┌─────┐ ┌──────────┐ │
 │  │ STT  │ │ LLM │ │  Agent   │ │
-│  │Whisper│ │Qwen3│ │smolagents│ │
+│  │Whisper│ │Ollama│ │smolagents│ │
 │  └──────┘ └─────┘ └──────────┘ │
 │  ┌──────┐ ┌─────────────────┐  │
 │  │ TTS  │ │    ツール群      │  │
@@ -74,7 +74,9 @@ cd desktop-assistant
 - Python仮想環境の作成
 - Pythonパッケージのインストール
 - Node.jsパッケージのインストール
-- Ollama + Qwen3-8Bモデルのダウンロード
+- Ollamaのインストール済みモデル確認（モデル自体は自動ダウンロードしません）
+
+モデルがまだない場合は、Ollamaを起動して `ollama pull qwen2.5:7b` などで取得してください。アプリ右上の歯車から、ダウンロード済みモデルを選べます。
 
 ### 3. 起動
 
@@ -96,9 +98,7 @@ cd desktop-assistant
 4. 音声が文字起こしされ、アシスタントが返答
 
 ### キャラクター変更
-1. VRMモデルファイル(.vrm)を `electron/assets/models/` に配置
-2. 設定画面からモデルを選択
-3. キャラクターが切り替わる
+`electron/assets/models/aura.vrm` を置き換えてからアプリを再起動してください。歯車の設定画面ではOllamaモデルを切り替えられます。
 
 ### ショートカットキー
 | キー | 動作 |
@@ -130,7 +130,7 @@ cd desktop-assistant
 $env:LLM_MODEL = "qwen3:14b"
 
 # Whisperモデルサイズの変更
-$env:WHISPER_MODEL = "medium"
+$env:WHISPER_MODEL_SIZE = "medium"
 
 # TTSの声の変更
 $env:TTS_VOICE = "jf_alpha"
@@ -175,7 +175,7 @@ desktop-assistant/
 # 仮想環境の確認
 cd backend
 .\.venv\Scripts\Activate.ps1
-python -m uvicorn main:app --host 0.0.0.0 --port 8765 --log-level debug
+python -m uvicorn main:app --host 127.0.0.1 --port 8765 --log-level debug
 ```
 
 ### Ollamaに接続できない
@@ -183,7 +183,7 @@ python -m uvicorn main:app --host 0.0.0.0 --port 8765 --log-level debug
 # Ollamaの状態確認
 ollama list
 # モデルの再ダウンロード
-ollama pull qwen3:8b
+ollama pull qwen2.5:7b
 ```
 
 ### 音声認識が動かない
@@ -199,7 +199,7 @@ ollama pull qwen3:8b
 
 | 項目 | 技術/モデル | ライセンス |
 |:---|:---|:---|
-| LLM | [Qwen3-8B](https://huggingface.co/Qwen/Qwen3-8B) | Apache 2.0 |
+| LLM | Ollamaでインストールした任意の対応モデル | モデルごとに異なります |
 | STT | [faster-whisper](https://github.com/SYSTRAN/faster-whisper) | MIT |
 | TTS | [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) | Apache 2.0 |
 | Agent | [smolagents](https://github.com/huggingface/smolagents) | Apache 2.0 |

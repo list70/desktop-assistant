@@ -14,7 +14,7 @@ class GetCurrentTimeTool(Tool):
 
 class OpenApplicationTool(Tool):
     name = "open_application"
-    description = "Opens an application by path or command."
+    description = "Opens an application command without invoking a shell. Provide one executable name or path."
     inputs = {
         "command": {
             "type": "string",
@@ -25,7 +25,9 @@ class OpenApplicationTool(Tool):
 
     def forward(self, command: str) -> str:
         try:
-            subprocess.Popen(command, shell=True)
+            if not command.strip():
+                return "Error starting app: command is empty"
+            subprocess.Popen(command, shell=False)
             return f"Started {command}"
         except Exception as e:
             return f"Error starting app: {e}"

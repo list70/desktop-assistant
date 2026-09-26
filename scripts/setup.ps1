@@ -17,6 +17,10 @@ if (-not $python) {
     exit 1
 }
 $pythonVersion = python --version 2>&1
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "  ERROR: Python was found on PATH but could not be started. Repair or reinstall Python 3.10 - 3.12, then rerun setup." -ForegroundColor Red
+    exit 1
+}
 Write-Host "  Python: $pythonVersion" -ForegroundColor Green
 
 $node = Get-Command node -ErrorAction SilentlyContinue
@@ -41,15 +45,34 @@ Write-Host ""
 Write-Host "[2/6] Setting up Python virtual environment..." -ForegroundColor Yellow
 
 $venvPath = Join-Path $ProjectRoot "backend\.venv"
-if (-not (Test-Path $venvPath)) {
+ $venvPython = Join-Path $venvPath "Scripts\python.exe"
+$venvUsable = $false
+if (Test-Path $venvPython) {
+    & $venvPython --version *> $null
+    $venvUsable = ($LASTEXITCODE -eq 0)
+}
+if (-not $venvUsable) {
+    if (Test-Path $venvPath) {
+        $resolvedRoot = [System.IO.Path]::GetFullPath($ProjectRoot).TrimEnd('\') + '\'
+        $resolvedVenv = [System.IO.Path]::GetFullPath($venvPath)
+        if (-not $resolvedVenv.StartsWith($resolvedRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+            Write-Host "  ERROR: Refusing to rebuild a virtual environment outside this project." -ForegroundColor Red
+            exit 1
+        }
+        Write-Host "  Existing virtual environment is broken; rebuilding it..." -ForegroundColor Yellow
+        Remove-Item -LiteralPath $resolvedVenv -Recurse -Force
+    }
     Write-Host "  Creating venv at $venvPath..."
     python -m venv "$venvPath"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "  ERROR: Could not create the Python virtual environment." -ForegroundColor Red
+        exit 1
+    }
     Write-Host "  Virtual environment created." -ForegroundColor Green
 } else {
     Write-Host "  Virtual environment already exists." -ForegroundColor Green
 }
 
-$venvPython = Join-Path $venvPath "Scripts\python.exe"
 $venvPip = Join-Path $venvPath "Scripts\pip.exe"
 Write-Host ""
 
@@ -102,8 +125,13 @@ if (-not $ollama) {
     Write-Host "  After install, run: ollama pull qwen2.5:7b (or qwen3:8b)" -ForegroundColor Gray
 } else {
     Write-Host "  Ollama: Installed." -ForegroundColor Green
-    Write-Host "  Pulling model qwen2.5:7b (or check local)..."
-    ollama pull qwen2.5:7b
+    $ollamaModels = @(ollama list 2>$null | Select-Object -Skip 1 | Where-Object { $_.Trim() })
+    if ($ollamaModels.Count -gt 0) {
+        Write-Host "  Found $($ollamaModels.Count) installed model(s); keep them and select one in app settings." -ForegroundColor Green
+    } else {
+        Write-Host "  No models are installed yet." -ForegroundColor Yellow
+        Write-Host "  Download one when ready, for example: ollama pull qwen2.5:7b" -ForegroundColor Gray
+    }
 }
 Write-Host ""
 
