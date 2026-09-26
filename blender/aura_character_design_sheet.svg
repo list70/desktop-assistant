@@ -1,0 +1,186 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1120" viewBox="0 0 1800 1120">
+  <defs>
+    <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b8f0fa"/><stop offset=".48" stop-color="#72bce7"/><stop offset="1" stop-color="#4c82c5"/></linearGradient>
+    <linearGradient id="coat" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fffefa"/><stop offset="1" stop-color="#dceaf8"/></linearGradient>
+    <linearGradient id="iris" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#43d8e8"/><stop offset=".55" stop-color="#3984d7"/><stop offset="1" stop-color="#263b82"/></linearGradient>
+    <radialGradient id="paper"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#eef6fb"/></radialGradient>
+    <filter id="shadow" x="-.2" y="-.2" width="1.4" height="1.4"><feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#9bb8cb" flood-opacity=".16"/></filter>
+    <style>
+      .ink{stroke:#304b70;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+      .thin{stroke:#6485a8;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+      .cyan{stroke:#42cfde;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+      .label{font:700 19px 'Segoe UI',sans-serif;letter-spacing:3px;fill:#42617d}
+      .small{font:600 12px 'Segoe UI',sans-serif;letter-spacing:2px;fill:#849bb0}
+      .bodyline{fill:none;stroke:#506f8e;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+    </style>
+  </defs>
+  <rect width="1800" height="1120" fill="#edf5fa"/>
+  <circle cx="90" cy="95" r="210" fill="#dff4f7" opacity=".58"/>
+  <circle cx="1700" cy="1050" r="250" fill="#e1eafa" opacity=".65"/>
+  <text x="78" y="78" font-family="Segoe UI,sans-serif" font-size="17" letter-spacing="6" font-weight="700" fill="#6da3c8">DESKTOP ASSISTANT / AVATAR PROJECT</text>
+  <text x="76" y="151" font-family="Segoe UI,sans-serif" font-size="62" font-weight="800" letter-spacing="4" fill="#294465">AURA</text>
+  <text x="80" y="190" class="small">CHARACTER TURNAROUND  ·  V 01  ·  FRONT / SIDE / BACK</text>
+  <path d="M690 108h180M870 108h180" stroke="#cae0ed" stroke-width="2"/>
+  <g class="small"><text x="758" y="93">01</text><text x="938" y="93">02</text></g>
+
+  <!-- FRONT VIEW -->
+  <g transform="translate(265 228)" filter="url(#shadow)">
+    <!-- twin tails and back hair -->
+    <path d="M-94 118 C-153 174 -151 311 -116 366 C-87 363 -77 335 -83 299 C-94 242 -69 184 -48 153Z" fill="url(#hair)" class="ink"/>
+    <path d="M94 118 C153 174 151 311 116 366 C87 363 77 335 83 299 C94 242 69 184 48 153Z" fill="url(#hair)" class="ink"/>
+    <path d="M-111 250q22 24 26 66M111 250q-22 24 -26 66" fill="none" stroke="#c5f7fb" stroke-width="5" opacity=".8"/>
+    <!-- legs -->
+    <path d="M-43 637Q-48 711 -40 801Q-36 826 -15 826Q1 823 2 798L8 660Z" fill="#ffd4c5" class="ink"/>
+    <path d="M43 637Q48 711 40 801Q36 826 15 826Q-1 823 -2 798L-8 660Z" fill="#ffd4c5" class="ink"/>
+    <!-- socks -->
+    <path d="M-41 750q21 15 48 0l-4 57q-1 20-20 20-19 0-20-21Z" fill="#f8fcff" class="thin"/>
+    <path d="M41 750q-21 15-48 0l4 57q1 20 20 20 19 0 20-21Z" fill="#f8fcff" class="thin"/>
+    <path d="M-39 764h42M39 764H-3" class="cyan" fill="none" stroke-width="4"/>
+    <!-- boots -->
+    <path d="M-38 805Q-34 825 -41 843Q-45 865 -71 870Q-86 875 -84 889Q-81 902 -56 902H-3Q10 899 7 885L0 824Z" fill="#6595c4" class="ink"/>
+    <path d="M38 805Q34 825 41 843Q45 865 71 870Q86 875 84 889Q81 902 56 902H3Q-10 899 -7 885L0 824Z" fill="#6595c4" class="ink"/>
+    <path d="M-75 882q34 10 76 2M75 882q-34 10-76 2" fill="none" stroke="#b5f3f7" stroke-width="5"/>
+    <path d="M-68 865l28-5M68 865l-28-5" class="thin" fill="none"/>
+    <!-- arms behind torso -->
+    <path d="M-76 478Q-118 493 -145 567Q-153 590 -135 601Q-116 612 -105 590L-56 526Z" fill="#ffd4c5" class="ink"/>
+    <path d="M76 478Q118 493 145 567Q153 590 135 601Q116 612 105 590L56 526Z" fill="#ffd4c5" class="ink"/>
+    <path d="M-148 566l31 13M148 566l-31 13" class="cyan" fill="none"/>
+    <!-- skirt -->
+    <path d="M-65 595Q0 617 65 595L106 720Q0 759-106 720Z" fill="#79bce5" class="ink"/>
+    <path d="M-106 720Q0 744 106 720L101 737Q0 762-101 737Z" fill="#d9f6f8" class="thin"/>
+    <path d="M-39 612l-17 111M-13 618l-6 117M14 618l6 117M40 612l17 111" fill="none" stroke="#4c92c8" stroke-width="3" opacity=".86"/>
+    <path d="M-65 596Q0 615 65 596" fill="none" stroke="#e7fbff" stroke-width="7"/>
+    <!-- body / jacket -->
+    <path d="M-43 405Q-70 415-83 460L-69 610Q0 632 69 610L83 460Q70 415 43 405L0 428Z" fill="url(#coat)" class="ink"/>
+    <path d="M-39 421L-11 448L0 514L-32 478Z" fill="#ffffff" class="thin"/>
+    <path d="M39 421L11 448L0 514L32 478Z" fill="#ffffff" class="thin"/>
+    <path d="M-12 449L0 468L12 449L8 521L0 535L-8 521Z" fill="#69b6e2" class="thin"/>
+    <circle cx="0" cy="554" r="6" fill="#4fc9d7"/><circle cx="0" cy="578" r="6" fill="#4fc9d7"/>
+    <path d="M-75 474Q0 500 75 474" fill="none" stroke="#a7d8ed" stroke-width="3"/>
+    <path d="M-61 603q61 16 122 0" class="cyan" fill="none" stroke-width="4"/>
+    <path d="M-67 535l22 4v27l-24-5ZM67 535l-22 4v27l24-5" fill="#d7ebf6" class="thin"/>
+    <!-- neck and collar -->
+    <path d="M-17 382v46q17 15 34 0v-46Z" fill="#ffd4c5" class="thin"/>
+    <path d="M-39 408L-21 389L0 425L-27 447ZM39 408L21 389L0 425L27 447Z" fill="#fbfdff" class="ink"/>
+    <!-- ears -->
+    <ellipse cx="-94" cy="277" rx="17" ry="29" fill="#ffd4c5" class="ink"/><ellipse cx="94" cy="277" rx="17" ry="29" fill="#ffd4c5" class="ink"/>
+    <!-- face -->
+    <ellipse cx="0" cy="278" rx="101" ry="139" fill="#ffd4c5" class="ink"/>
+    <path d="M-71 324q17 10 34 0M71 324q-17 10-34 0" fill="none" stroke="#f5a6a9" stroke-width="8" opacity=".6"/>
+    <!-- brows -->
+    <path d="M-68 234q22-14 42-2M68 234q-22-14-42-2" fill="none" stroke="#456d9d" stroke-width="6" stroke-linecap="round"/>
+    <!-- eyes -->
+    <ellipse cx="-47" cy="274" rx="28" ry="38" fill="#fff" class="thin"/>
+    <ellipse cx="47" cy="274" rx="28" ry="38" fill="#fff" class="thin"/>
+    <ellipse cx="-45" cy="281" rx="19" ry="28" fill="url(#iris)"/>
+    <ellipse cx="45" cy="281" rx="19" ry="28" fill="url(#iris)"/>
+    <ellipse cx="-44" cy="284" rx="10" ry="19" fill="#202e59"/>
+    <ellipse cx="44" cy="284" rx="10" ry="19" fill="#202e59"/>
+    <circle cx="-51" cy="266" r="8" fill="#fff"/><circle cx="38" cy="266" r="8" fill="#fff"/>
+    <circle cx="-36" cy="291" r="4" fill="#b7ffff"/><circle cx="53" cy="291" r="4" fill="#b7ffff"/>
+    <path d="M-76 263q27-48 59 1M76 263q-27-48-59 1" fill="none" stroke="#304b70" stroke-width="6" stroke-linecap="round"/>
+    <!-- nose and smile -->
+    <path d="M0 294q-6 13 4 14" fill="none" stroke="#eaa798" stroke-width="3" stroke-linecap="round"/>
+    <path d="M-18 344q18 24 36 0" fill="#bb5271" class="thin"/>
+    <path d="M-15 344q15 5 30 0" fill="none" stroke="#fff2eb" stroke-width="3"/>
+    <!-- hair cap and fringe -->
+    <path d="M-100 278Q-115 147 0 137Q115 147 100 278Q89 235 70 222Q48 214 27 237Q4 215-17 241Q-42 214-61 236Q-81 246-100 278Z" fill="url(#hair)" class="ink"/>
+    <path d="M-91 208Q-87 156-37 146M-18 144Q28 141 48 166M63 164q21 24 24 53" fill="none" stroke="#d8fbff" stroke-width="6" stroke-linecap="round" opacity=".9"/>
+    <path d="M-59 222Q-68 266-50 282Q-27 269-18 235Q-9 276 10 284Q28 258 25 228Q40 265 65 273Q77 247 70 221Q47 196 28 218Q5 195-17 220Q-42 198-59 222Z" fill="url(#hair)" class="thin"/>
+    <!-- side buns, ties, and signature star -->
+    <circle cx="-108" cy="183" r="30" fill="url(#hair)" class="ink"/><circle cx="108" cy="183" r="30" fill="url(#hair)" class="ink"/>
+    <path d="M-130 178q18-20 37-4M130 178q-18-20-37-4" fill="none" stroke="#dcfbff" stroke-width="5"/>
+    <path d="M-112 218l17 24 14-20M112 218l-17 24-14-20" fill="#58d1dc" class="thin"/>
+    <path d="M-101 197l5-12 5 12 12 2-9 8 2 12-10-7-10 7 2-12-9-8Z" fill="#fff3bf" stroke="#e3bf6e" stroke-width="2"/>
+  </g>
+  <path d="M88 1080H616" stroke="#cbdde9" stroke-width="2"/><text x="288" y="1070" class="label">FRONT</text>
+
+  <!-- SIDE VIEW: same silhouette, facing left -->
+  <g transform="translate(900 228)" filter="url(#shadow)">
+    <!-- rear tail -->
+    <path d="M45 174Q118 215 101 332Q96 371 70 382Q52 374 61 339Q78 263 28 220Z" fill="url(#hair)" class="ink"/>
+    <!-- legs -->
+    <path d="M8 643Q0 740 4 814Q7 838 24 838Q40 835 39 814L44 659Z" fill="#ffd4c5" class="ink"/>
+    <path d="M30 760q14 8 24-2l-3 52q-1 22-19 23l-15-5Z" fill="#f8fcff" class="thin"/>
+    <path d="M12 808q8 23-3 41-10 19 13 28l53 7q21 1 23-13 2-13-20-19-26-6-30-48Z" fill="#6595c4" class="ink"/>
+    <path d="M9 876q34 10 74 1" fill="none" stroke="#b5f3f7" stroke-width="5"/>
+    <!-- arm profile -->
+    <path d="M28 468Q73 502 91 575Q95 598 76 605Q58 610 51 586L17 519Z" fill="#ffd4c5" class="ink"/>
+    <path d="M79 568l-28 10" class="cyan" fill="none"/>
+    <!-- skirt side -->
+    <path d="M-35 601Q8 614 55 596L83 718Q27 744-69 723Z" fill="#79bce5" class="ink"/>
+    <path d="M-69 723Q9 741 83 718L79 736Q8 756-65 740Z" fill="#d9f6f8" class="thin"/>
+    <path d="M-10 613l-19 112M20 613l-1 120M45 609l22 109" fill="none" stroke="#4c92c8" stroke-width="3"/>
+    <!-- jacket -->
+    <path d="M-8 406Q25 412 40 459L53 606Q-6 629-63 607L-49 467Q-38 417-8 406Z" fill="url(#coat)" class="ink"/>
+    <path d="M-43 478q44 18 83 1M-58 602q56 14 111 0" fill="none" stroke="#a7d8ed" stroke-width="4"/>
+    <path d="M-2 531l25 5v25l-25-5Z" fill="#d7ebf6" class="thin"/>
+    <!-- neck / face profile -->
+    <path d="M-8 378v43q17 14 34 0v-43Z" fill="#ffd4c5" class="thin"/>
+    <path d="M8 144Q-79 152-82 264Q-82 352-34 395Q-9 416 28 390Q66 358 64 278L54 192Z" fill="#ffd4c5" class="ink"/>
+    <ellipse cx="-77" cy="276" rx="13" ry="24" fill="#ffd4c5" class="thin"/>
+    <!-- visible eye/nose/mouth profile -->
+    <path d="M-82 263q31-20 55 2M-77 274q19 5 20 23" fill="none" stroke="#304b70" stroke-width="5" stroke-linecap="round"/>
+    <ellipse cx="-61" cy="279" rx="10" ry="20" fill="url(#iris)"/>
+    <ellipse cx="-59" cy="281" rx="5" ry="12" fill="#202e59"/><circle cx="-64" cy="270" r="4" fill="#fff"/>
+    <path d="M-80 314q-16 12-5 18l8 2M-62 350q14 8 25-2" fill="none" stroke="#eaa798" stroke-width="3" stroke-linecap="round"/>
+    <path d="M-82 336h13" class="cyan" fill="none" stroke-width="3"/>
+    <!-- hair -->
+    <path d="M-87 280Q-111 154 2 137Q109 152 66 289Q42 230 21 226Q-2 230-18 257Q-36 227-56 242Q-71 254-87 280Z" fill="url(#hair)" class="ink"/>
+    <path d="M-78 201Q-47 151-4 147M18 149q41 16 48 51" fill="none" stroke="#d8fbff" stroke-width="6" stroke-linecap="round"/>
+    <path d="M-52 234Q-62 274-40 294Q-24 277-17 250Q-7 282 10 290Q29 264 24 229Q10 212-9 231Q-31 212-52 234Z" fill="url(#hair)" class="thin"/>
+    <circle cx="60" cy="184" r="29" fill="url(#hair)" class="ink"/>
+    <path d="M42 177q20-20 34-5" fill="none" stroke="#dcfbff" stroke-width="5"/>
+    <path d="M42 216l16 22 14-20" fill="#58d1dc" class="thin"/>
+    <path d="M-93 187q-6 13 5 20l11-16-7-13Z" fill="#58d1dc" class="thin"/>
+  </g>
+  <path d="M690 1080H1118" stroke="#cbdde9" stroke-width="2"/><text x="857" y="1070" class="label">SIDE</text>
+
+  <!-- BACK VIEW -->
+  <g transform="translate(1480 228)" filter="url(#shadow)">
+    <!-- tails -->
+    <path d="M-96 126Q-157 176-148 316Q-143 363-112 381Q-89 363-98 326Q-111 249-52 178Z" fill="url(#hair)" class="ink"/>
+    <path d="M96 126Q157 176 148 316Q143 363 112 381Q89 363 98 326Q111 249 52 178Z" fill="url(#hair)" class="ink"/>
+    <path d="M-133 269q22 16 24 59M133 269q-22 16-24 59" fill="none" stroke="#d8fbff" stroke-width="5"/>
+    <!-- boots, legs -->
+    <path d="M-42 639Q-48 712-40 802Q-36 828-15 827Q1 823 2 800L8 655Z" fill="#ffd4c5" class="ink"/>
+    <path d="M42 639Q48 712 40 802Q36 828 15 827Q-1 823-2 800L-8 655Z" fill="#ffd4c5" class="ink"/>
+    <path d="M-41 758q20 11 47 0l-5 54q-1 20-20 20-19 0-20-21ZM41 758q-20 11-47 0l5 54q1 20 20 20 19 0 20-21Z" fill="#f8fcff" class="thin"/>
+    <path d="M-39 772h40M39 772H-1" class="cyan" fill="none" stroke-width="4"/>
+    <path d="M-38 808Q-34 826-42 847q-8 21 16 30l48 8q21 1 23-13 1-13-21-20-23-7-25-44ZM38 808Q34 826 42 847q8 21-16 30l-48 8q-21 1-23-13-1-13 21-20 23-7 25-44Z" fill="#6595c4" class="ink"/>
+    <path d="M-74 881q36 10 77 2M74 881q-36 10-77 2" fill="none" stroke="#b5f3f7" stroke-width="5"/>
+    <!-- arms -->
+    <path d="M-76 476Q-120 495-145 566Q-153 590-135 601Q-116 612-105 590L-57 526Z" fill="#ffd4c5" class="ink"/>
+    <path d="M76 476Q120 495 145 566Q153 590 135 601Q116 612 105 590L57 526Z" fill="#ffd4c5" class="ink"/>
+    <!-- skirt -->
+    <path d="M-65 595Q0 617 65 595L106 720Q0 759-106 720Z" fill="#79bce5" class="ink"/>
+    <path d="M-106 720Q0 744 106 720L101 737Q0 762-101 737Z" fill="#d9f6f8" class="thin"/>
+    <path d="M-39 612l-17 111M-13 618l-6 117M14 618l6 117M40 612l17 111" fill="none" stroke="#4c92c8" stroke-width="3"/>
+    <!-- back of jacket -->
+    <path d="M-43 405Q-70 415-83 460L-69 610Q0 632 69 610L83 460Q70 415 43 405L0 428Z" fill="url(#coat)" class="ink"/>
+    <path d="M-73 476Q0 498 73 476M-63 526Q0 546 63 526M-61 603q61 16 122 0" fill="none" stroke="#9fcce3" stroke-width="3"/>
+    <path d="M-34 451q34 20 68 0v52q-34 14-68 0Z" fill="#dcecf6" class="thin"/>
+    <path d="M-21 438v94M21 438v94" fill="none" stroke="#b9d2e4" stroke-width="2"/>
+    <path d="M-15 605l15 14 15-14" fill="#54cfdb"/>
+    <!-- neck and ears -->
+    <path d="M-17 382v46q17 15 34 0v-46Z" fill="#ffd4c5" class="thin"/>
+    <ellipse cx="-94" cy="277" rx="17" ry="29" fill="#ffd4c5" class="thin"/><ellipse cx="94" cy="277" rx="17" ry="29" fill="#ffd4c5" class="thin"/>
+    <!-- rear head and hair -->
+    <ellipse cx="0" cy="278" rx="101" ry="139" fill="#ffd4c5" class="thin"/>
+    <path d="M-100 278Q-115 147 0 137Q115 147 100 278L89 359Q61 411 0 414Q-61 411-89 359Z" fill="url(#hair)" class="ink"/>
+    <path d="M-74 174Q-44 145 0 146M20 149q47 16 65 58M-80 214q18 47 10 106M80 214q-18 47-10 106" fill="none" stroke="#d8fbff" stroke-width="6" stroke-linecap="round" opacity=".88"/>
+    <path d="M-83 334q39 32 83 29 44 3 83-29M-58 375q27 19 58 17 31 2 58-17" fill="none" stroke="#4d89c4" stroke-width="4" opacity=".7"/>
+    <circle cx="-108" cy="183" r="30" fill="url(#hair)" class="ink"/><circle cx="108" cy="183" r="30" fill="url(#hair)" class="ink"/>
+    <path d="M-130 178q18-20 37-4M130 178q-18-20-37-4" fill="none" stroke="#dcfbff" stroke-width="5"/>
+    <path d="M-112 218l17 24 14-20M112 218l-17 24-14-20" fill="#58d1dc" class="thin"/>
+    <path d="M0 390l7 14 16 2-12 10 4 15-15-8-15 8 4-15-12-10 16-2Z" fill="#fff3bf" stroke="#e3bf6e" stroke-width="2"/>
+  </g>
+  <path d="M1290 1080H1708" stroke="#cbdde9" stroke-width="2"/><text x="1450" y="1070" class="label">BACK</text>
+
+  <!-- swatches and silhouette notes -->
+  <g transform="translate(1240 72)">
+    <rect x="0" y="0" width="18" height="18" rx="5" fill="#79bce5"/><rect x="27" y="0" width="18" height="18" rx="5" fill="#fffefa" stroke="#bdd1e1"/><rect x="54" y="0" width="18" height="18" rx="5" fill="#58d1dc"/><rect x="81" y="0" width="18" height="18" rx="5" fill="#ffd4c5"/>
+    <text x="111" y="15" class="small">SKY / PEARL / CYAN / PEACH</text>
+  </g>
+  <text x="76" y="1102" class="small">DESIGN NOTES  ·  PETITE CHIBI PROPORTIONS  ·  POWDER-BLUE TWIN-TAIL BOB  ·  PEARL TECH JACKET  ·  PLEATED SKY SKIRT</text>
+</svg>
