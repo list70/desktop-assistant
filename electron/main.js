@@ -20,7 +20,9 @@ function createWindow() {
     hasShadow: false,
     resizable: true,
     webPreferences: {
+      nodeIntegration: false,
       contextIsolation: true,
+      sandbox: true,
       preload: path.join(__dirname, 'preload.js')
     }
   });
@@ -28,6 +30,7 @@ function createWindow() {
   mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
 
   globalShortcut.register('CommandOrControl+Shift+A', () => {
+    if (!mainWindow || mainWindow.isDestroyed()) return;
     if (mainWindow.isVisible()) {
       mainWindow.hide();
     } else {
@@ -43,10 +46,10 @@ function createTray() {
     const icon = nativeImage.createEmpty();
     tray = new Tray(icon);
     const contextMenu = Menu.buildFromTemplate([
-      { label: '表示する', click: () => mainWindow.show() },
-      { label: '隠す', click: () => mainWindow.hide() },
+      { label: '表示する', click: () => mainWindow && !mainWindow.isDestroyed() && mainWindow.show() },
+      { label: '隠す', click: () => mainWindow && !mainWindow.isDestroyed() && mainWindow.hide() },
       { type: 'separator' },
-      { label: '開発者ツール', click: () => mainWindow.webContents.openDevTools({ mode: 'detach' }) },
+      { label: '開発者ツール', click: () => mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents.openDevTools({ mode: 'detach' }) },
       { type: 'separator' },
       { label: '終了', click: () => app.quit() }
     ]);
@@ -81,7 +84,7 @@ app.whenReady().then(() => {
   });
 
   ipcMain.on('open-dev-tools', () => {
-    mainWindow.webContents.openDevTools({ mode: 'detach' });
+    if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.openDevTools({ mode: 'detach' });
   });
 
   app.on('activate', () => {
@@ -91,6 +94,10 @@ app.whenReady().then(() => {
 
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
+});
+
+app.on('before-quit', () => {
+  if (tray) tray.destroy();
 });
 
 app.on('window-all-closed', () => {

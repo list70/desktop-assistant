@@ -21,13 +21,31 @@ function Stop-ProcessTree([int]$pidToKill) {
 
 # 1. Check Ollama
 Write-Host "Checking Ollama..." -ForegroundColor Yellow
-try {
-    $null = Invoke-WebRequest -Uri "http://localhost:11434/api/tags" -TimeoutSec 3 -ErrorAction Stop
-    Write-Host "  Ollama: Running." -ForegroundColor Green
-} catch {
-    Write-Host "  Ollama not running. Starting Ollama in background..." -ForegroundColor Yellow
-    Start-Process "ollama" -ArgumentList "serve" -WindowStyle Hidden
-    Start-Sleep -Seconds 3
+$ollamaCommand = Get-Command ollama -ErrorAction SilentlyContinue
+if (-not $ollamaCommand) {
+    Write-Host "  Ollama is not installed or not on PATH. LLM features will be unavailable until it is installed." -ForegroundColor Yellow
+} else {
+    try {
+        $null = Invoke-WebRequest -Uri "http://127.0.0.1:11434/api/tags" -TimeoutSec 3 -ErrorAction Stop
+        Write-Host "  Ollama: Running." -ForegroundColor Green
+    } catch {
+        Write-Host "  Ollama not running. Starting Ollama in background..." -ForegroundColor Yellow
+        Start-Process -FilePath $ollamaCommand.Source -ArgumentList "serve" -WindowStyle Hidden
+        $ollamaReady = $false
+        for ($attempt = 0; $attempt -lt 10; $attempt++) {
+            Start-Sleep -Seconds 1
+            try {
+                $null = Invoke-WebRequest -Uri "http://127.0.0.1:11434/api/tags" -TimeoutSec 2 -ErrorAction Stop
+                $ollamaReady = $true
+                break
+            } catch {}
+        }
+        if ($ollamaReady) {
+            Write-Host "  Ollama: Running." -ForegroundColor Green
+        } else {
+            Write-Host "  Ollama did not start. Check Ollama installation and retry." -ForegroundColor Yellow
+        }
+    }
 }
 Write-Host ""
 
@@ -41,33 +59,42 @@ if (-not (Test-Path $venvPython)) {
     exit 1
 }
 
-# Ensure port 8765 is free before starting
+# Reuse a healthy backend. Never terminate an unrelated process occupying this port.
+$backendProcess = $null
+$backendReady = $false
 try {
-    $portUsers = Get-NetTCPConnection -LocalPort 8765 -ErrorAction SilentlyContinue
-    foreach ($conn in $portUsers) {
-        Stop-ProcessTree $conn.OwningProcess
+    $health = Invoke-RestMethod -Uri "http://127.0.0.1:8765/health" -TimeoutSec 2 -ErrorAction Stop
+    if ($health.features -contains "ollama_model_selection") {
+        $backendReady = $true
+        Write-Host "  Reusing the healthy backend already running on port 8765." -ForegroundColor Green
     }
 } catch {}
 
-# Launch backend in a visible cmd window titled 'Desktop Assistant - Backend Log'
-$cmdArgs = "/k title Desktop Assistant - Backend Log && `"$venvPython`" -m uvicorn main:app --host 0.0.0.0 --port 8765 --log-level info"
-$backendProcess = Start-Process -FilePath "cmd.exe" -ArgumentList $cmdArgs -WorkingDirectory $backendDir -PassThru -WindowStyle Normal
-Write-Host "  Backend Log Window opened (PID: $($backendProcess.Id))." -ForegroundColor Green
+if (-not $backendReady) {
+    $portUsers = @(Get-NetTCPConnection -LocalPort 8765 -State Listen -ErrorAction SilentlyContinue)
+    if ($portUsers.Count -gt 0) {
+        Write-Host "  ERROR: Port 8765 is occupied by a process that is not a healthy assistant backend. It was left running." -ForegroundColor Red
+        exit 1
+    }
 
-Write-Host "  Waiting for backend connection on port 8765..." -ForegroundColor Gray
-$maxRetries = 20
-$retryCount = 0
-$backendReady = $false
+    # Launch backend in a visible cmd window titled 'Desktop Assistant - Backend Log'
+    $cmdArgs = "/k title Desktop Assistant - Backend Log && `"$venvPython`" -m uvicorn main:app --host 127.0.0.1 --port 8765 --log-level info"
+    $backendProcess = Start-Process -FilePath "cmd.exe" -ArgumentList $cmdArgs -WorkingDirectory $backendDir -PassThru -WindowStyle Normal
+    Write-Host "  Backend Log Window opened (PID: $($backendProcess.Id))." -ForegroundColor Green
 
-while ($retryCount -lt $maxRetries) {
-    Start-Sleep -Seconds 1
-    try {
-        $null = Invoke-WebRequest -Uri "http://localhost:8765/health" -TimeoutSec 2 -ErrorAction Stop
-        $backendReady = $true
-        break
-    } catch {
-        $retryCount++
-        Write-Host "  Waiting for backend... ($retryCount/$maxRetries)" -ForegroundColor Gray
+    Write-Host "  Waiting for backend connection on port 8765..." -ForegroundColor Gray
+    $maxRetries = 20
+    $retryCount = 0
+    while ($retryCount -lt $maxRetries) {
+        Start-Sleep -Seconds 1
+        try {
+            $null = Invoke-WebRequest -Uri "http://127.0.0.1:8765/health" -TimeoutSec 2 -ErrorAction Stop
+            $backendReady = $true
+            break
+        } catch {
+            $retryCount++
+            Write-Host "  Waiting for backend... ($retryCount/$maxRetries)" -ForegroundColor Gray
+        }
     }
 }
 
@@ -101,8 +128,8 @@ Write-Host "  'exit' or 'stop' : Terminate the entire assistant" -ForegroundColo
 Write-Host "  'status'         : Check processes and server status" -ForegroundColor White
 Write-Host "  'clear'          : Clear this console screen" -ForegroundColor White
 Write-Host "--------------------------------------------" -ForegroundColor Gray
-Write-Host "Tip: Press F12 or click gear icon (⚙) on the mascot for frontend DevTools." -ForegroundColor Gray
-Write-Host "Tip: Check the 'Backend Log' window for AI/TTS/STT live activity." -ForegroundColor Gray
+Write-Host "Tip: Press F12 for frontend DevTools; click the gear icon (⚙) to choose an installed Ollama model." -ForegroundColor Gray
+if ($backendProcess) { Write-Host "Tip: Check the 'Backend Log' window for AI/TTS/STT live activity." -ForegroundColor Gray }
 Write-Host ""
 
 # 4. Interactive Console Loop
@@ -118,9 +145,9 @@ try {
                     break
                 } elseif ($cmd -eq "status") {
                     $feRunning = if ($electronProcess.HasExited) { "Stopped" } else { "Running" }
-                    $beRunning = if ($backendProcess.HasExited) { "Stopped" } else { "Running" }
+                    $beRunning = if ($backendProcess -and -not $backendProcess.HasExited) { "Running (PID $($backendProcess.Id))" } elseif ($backendReady) { "Running (reused)" } else { "Stopped" }
                     Write-Host "  Frontend: $feRunning (PID $($electronProcess.Id))" -ForegroundColor Cyan
-                    Write-Host "  Backend:  $beRunning (PID $($backendProcess.Id))" -ForegroundColor Cyan
+                    Write-Host "  Backend:  $beRunning" -ForegroundColor Cyan
                 } elseif ($cmd -in @("clear", "cls")) {
                     Clear-Host
                     Write-Host "Type 'exit' or 'stop' to terminate assistant." -ForegroundColor Gray
@@ -139,23 +166,10 @@ try {
     if (-not $electronProcess.HasExited) {
         Stop-ProcessTree $electronProcess.Id
     }
-    # Also kill any leftover electron processes
-    Get-Process -Name "electron" -ErrorAction SilentlyContinue | ForEach-Object {
-        Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue
-    }
-
     # Clean up backend tree (cmd.exe + python.exe)
-    if (-not $backendProcess.HasExited) {
+    if ($backendProcess -and -not $backendProcess.HasExited) {
         Stop-ProcessTree $backendProcess.Id
     }
-
-    # Clean up any leftover processes on port 8765
-    try {
-        $portUsers = Get-NetTCPConnection -LocalPort 8765 -ErrorAction SilentlyContinue
-        foreach ($conn in $portUsers) {
-            Stop-ProcessTree $conn.OwningProcess
-        }
-    } catch {}
 
     Write-Host "Shutdown complete. Have a great day!" -ForegroundColor Cyan
 }

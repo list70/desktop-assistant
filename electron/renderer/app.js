@@ -3,10 +3,13 @@ import { ChatManager } from './chat.js';
 import { VoiceInput } from './voice-input.js';
 import { VoiceOutput } from './voice-output.js';
 
+const API_BASE = 'http://127.0.0.1:8765';
+
 export default class App {
   constructor() {
     this.ws = null;
     this.reconnectAttempts = 0;
+    this.currentModel = '';
     
     this.chat = new ChatManager();
     this.character = new CharacterManager();
@@ -22,12 +25,7 @@ export default class App {
       window.electronAPI.minimizeWindow();
     });
     
-    document.getElementById('settings-btn').addEventListener('click', () => {
-      if (window.electronAPI && window.electronAPI.openDevTools) {
-        window.electronAPI.openDevTools();
-        this.chat.addSystemMessage('⚙ 開発者ツール (DevTools) を開きました。ログを確認できます。');
-      }
-    });
+    this.initSettings();
 
     // F12 key to open DevTools
     document.addEventListener('keydown', (e) => {
@@ -45,24 +43,38 @@ export default class App {
     });
     
     const micBtn = document.getElementById('mic-btn');
+    this.voiceInput.onAutoStop = (audioBase64) => {
+      micBtn.classList.remove('recording');
+      if (audioBase64) this.sendAudioMessage(audioBase64);
+    };
     micBtn.addEventListener('click', async () => {
-      if (this.voiceInput.isRecording) {
-        const audioBase64 = await this.voiceInput.stopRecording();
-        micBtn.classList.remove('recording');
-        if (audioBase64) {
-          this.sendAudioMessage(audioBase64);
+      try {
+        if (this.voiceInput.isRecording) {
+          const audioBase64 = await this.voiceInput.stopRecording();
+          micBtn.classList.remove('recording');
+          if (audioBase64) this.sendAudioMessage(audioBase64);
+        } else {
+          const started = await this.voiceInput.startRecording();
+          micBtn.classList.toggle('recording', started);
+          if (!started) this.chat.addSystemMessage('マイクを利用できません。権限とデバイスを確認してください。');
         }
-      } else {
-        await this.voiceInput.startRecording();
-        micBtn.classList.add('recording');
+      } catch (error) {
+        micBtn.classList.remove('recording');
+        this.chat.addSystemMessage(`録音を開始できません: ${error.message}`);
       }
     });
 
     // Hold space to talk
     document.addEventListener('keydown', async (e) => {
-      if (e.code === 'Space' && e.target.tagName !== 'INPUT' && !this.voiceInput.isRecording) {
-        await this.voiceInput.startRecording();
-        micBtn.classList.add('recording');
+      if (e.code !== 'Space' || e.repeat || e.target.closest('input, textarea, select, button') || this.voiceInput.isRecording) return;
+      e.preventDefault();
+      try {
+        const started = await this.voiceInput.startRecording();
+        micBtn.classList.toggle('recording', started);
+        if (!started) this.chat.addSystemMessage('マイクを利用できません。権限とデバイスを確認してください。');
+      } catch (error) {
+        micBtn.classList.remove('recording');
+        this.chat.addSystemMessage(`録音を開始できません: ${error.message}`);
       }
     });
     
@@ -76,15 +88,131 @@ export default class App {
       }
     });
 
-    // Init modules
+    // Init modules. Microphone permission is requested only after the user starts recording.
     await this.character.init(document.getElementById('character-canvas'));
-    await this.voiceInput.init();
     
     // Connect WebSocket
     this.connectWebSocket();
     
     // Start render loop for lipsync
     this.startAudioSyncLoop();
+  }
+
+  initSettings() {
+    this.settingsModal = document.getElementById('settings-modal');
+    this.modelSelect = document.getElementById('llm-model-select');
+    this.settingsStatus = document.getElementById('settings-status');
+    this.saveSettingsButton = document.getElementById('settings-save-btn');
+
+    document.getElementById('settings-btn').addEventListener('click', () => this.openSettings());
+    document.getElementById('refresh-models-btn').addEventListener('click', () => this.refreshOllamaModels());
+    this.modelSelect.addEventListener('change', () => {
+      this.saveSettingsButton.disabled = !this.modelSelect.value || this.modelSelect.value === this.currentModel;
+    });
+    this.saveSettingsButton.addEventListener('click', () => this.saveSettings());
+    document.getElementById('settings-close-btn').addEventListener('click', () => this.closeSettings());
+    document.getElementById('settings-cancel-btn').addEventListener('click', () => this.closeSettings());
+    this.settingsModal.addEventListener('click', (event) => {
+      if (event.target === this.settingsModal) this.closeSettings();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !this.settingsModal.hidden) this.closeSettings();
+    });
+  }
+
+  async openSettings() {
+    this.settingsModal.hidden = false;
+    this.settingsModal.setAttribute('aria-hidden', 'false');
+    document.getElementById('llm-model-select').focus();
+    await this.refreshOllamaModels();
+  }
+
+  closeSettings() {
+    this.settingsModal.hidden = true;
+    this.settingsModal.setAttribute('aria-hidden', 'true');
+    document.getElementById('settings-btn').focus();
+  }
+
+  async refreshOllamaModels() {
+    const refreshButton = document.getElementById('refresh-models-btn');
+    refreshButton.disabled = true;
+    this.modelSelect.disabled = true;
+    this.saveSettingsButton.disabled = true;
+    this.settingsStatus.classList.remove('error');
+    this.settingsStatus.textContent = 'Ollamaのモデル一覧を取得しています…';
+    try {
+      const configResponse = await fetch(`${API_BASE}/config`);
+      if (!configResponse.ok) throw new Error('設定を読み込めません。バックエンドの状態を確認してください。');
+      const currentConfig = await configResponse.json();
+      const response = await fetch(`${API_BASE}/ollama/models`);
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.detail || 'Ollamaに接続できません。');
+
+      const models = Array.isArray(result.models) ? result.models : [];
+      this.currentModel = currentConfig.llm_model || '';
+      this.modelSelect.replaceChildren();
+      for (const model of models) {
+        const option = document.createElement('option');
+        option.value = model.name;
+        option.textContent = model.size ? `${model.name} (${this.formatModelSize(model.size)})` : model.name;
+        this.modelSelect.appendChild(option);
+      }
+      this.modelSelect.disabled = models.length === 0;
+      if (models.some((model) => model.name === this.currentModel)) {
+        this.modelSelect.value = this.currentModel;
+        this.settingsStatus.textContent = `${models.length}個のインストール済みモデルが見つかりました。`;
+      } else if (models.length > 0) {
+        this.modelSelect.selectedIndex = 0;
+        this.settingsStatus.textContent = `現在のモデル「${this.currentModel}」は未インストールです。利用可能なモデルを選んでください。`;
+        this.saveSettingsButton.disabled = false;
+      } else {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'インストール済みモデルがありません';
+        this.modelSelect.appendChild(option);
+        this.settingsStatus.textContent = 'Ollamaでモデルをダウンロードしてから一覧を更新してください。';
+      }
+    } catch (error) {
+      this.modelSelect.replaceChildren();
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'モデル一覧を取得できません';
+      this.modelSelect.appendChild(option);
+      this.settingsStatus.textContent = error.message;
+      this.settingsStatus.classList.add('error');
+    } finally {
+      refreshButton.disabled = false;
+    }
+  }
+
+  formatModelSize(size) {
+    if (!Number.isFinite(size) || size <= 0) return '';
+    const gib = size / (1024 ** 3);
+    return gib >= 1 ? `${gib.toFixed(1)} GB` : `${(size / (1024 ** 2)).toFixed(0)} MB`;
+  }
+
+  async saveSettings() {
+    const model = this.modelSelect.value;
+    if (!model) return;
+    this.saveSettingsButton.disabled = true;
+    this.settingsStatus.classList.remove('error');
+    this.settingsStatus.textContent = 'モデルを切り替えています…';
+    try {
+      const response = await fetch(`${API_BASE}/config`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ llm_model: model })
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.detail || 'モデルを保存できませんでした。');
+      this.currentModel = result.llm_model;
+      this.settingsStatus.textContent = `使用モデルを「${this.currentModel}」に切り替えました。`;
+      this.chat.addSystemMessage(`Ollamaモデルを ${this.currentModel} に切り替えました。`);
+    } catch (error) {
+      this.settingsStatus.textContent = error.message;
+      this.settingsStatus.classList.add('error');
+      this.saveSettingsButton.disabled = false;
+    }
   }
   
   startAudioSyncLoop() {
@@ -104,7 +232,7 @@ export default class App {
     this.updateStatus(false, '接続中...');
     
     try {
-      this.ws = new WebSocket('ws://localhost:8765/ws');
+      this.ws = new WebSocket('ws://127.0.0.1:8765/ws');
       
       this.ws.onopen = () => {
         this.reconnectAttempts = 0;

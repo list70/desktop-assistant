@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { VRMLoaderPlugin } from '@pixiv/three-vrm';
+import { VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm';
 
 export class CharacterManager {
   constructor() {
@@ -24,7 +24,8 @@ export class CharacterManager {
     this.scene = new THREE.Scene();
     
     this.camera = new THREE.PerspectiveCamera(30.0, canvas.clientWidth / canvas.clientHeight, 0.1, 20.0);
-    this.camera.position.set(0.0, 1.1, 2.5);
+    this.camera.position.set(0.0, 0.66, 2.8);
+    this.camera.lookAt(0.0, 0.62, 0.0);
     
     // Balanced lighting for anime cel-shading and standard materials
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
@@ -76,10 +77,10 @@ export class CharacterManager {
       this.vrm = gltf.userData.vrm;
       if (this.vrm && this.vrm.scene) {
         this.scene.add(this.vrm.scene);
-        this.vrm.scene.rotation.y = Math.PI;
+        // VRM 1.0 faces +Z. Only rotate legacy VRM 0.0 models that need it.
+        VRMUtils.rotateVRM0(this.vrm);
       } else if (gltf.scene) {
         this.scene.add(gltf.scene);
-        gltf.scene.rotation.y = Math.PI;
       }
     } catch (e) {
       console.error('Failed to load VRM:', e);

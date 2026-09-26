@@ -11,6 +11,7 @@ export class VoiceOutput {
     
     this.currentSource = null;
     this.isPlaying = false;
+    this.playbackId = 0;
   }
 
   base64ToArrayBuffer(base64) {
@@ -24,9 +25,8 @@ export class VoiceOutput {
   }
 
   async playAudio(base64WavData) {
-    if (this.currentSource) {
-      this.stop();
-    }
+    this.stop();
+    const playbackId = ++this.playbackId;
 
     try {
       if (this.audioContext.state === 'suspended') {
@@ -35,23 +35,31 @@ export class VoiceOutput {
 
       const arrayBuffer = this.base64ToArrayBuffer(base64WavData);
       const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+      if (playbackId !== this.playbackId) return;
       
-      this.currentSource = this.audioContext.createBufferSource();
-      this.currentSource.buffer = audioBuffer;
-      this.currentSource.connect(this.gainNode);
+      const source = this.audioContext.createBufferSource();
+      this.currentSource = source;
+      source.buffer = audioBuffer;
+      source.connect(this.gainNode);
       
       return new Promise((resolve) => {
-        this.currentSource.onended = () => {
-          this.isPlaying = false;
+        source.onended = () => {
+          if (this.currentSource === source) {
+            this.currentSource = null;
+            this.isPlaying = false;
+          }
           resolve();
         };
         
         this.isPlaying = true;
-        this.currentSource.start(0);
+        source.start(0);
       });
     } catch (e) {
       console.error('Failed to play audio:', e);
-      this.isPlaying = false;
+      if (playbackId === this.playbackId) {
+        this.currentSource = null;
+        this.isPlaying = false;
+      }
     }
   }
 
@@ -68,9 +76,12 @@ export class VoiceOutput {
   }
 
   stop() {
-    if (this.currentSource && this.isPlaying) {
-      this.currentSource.stop();
-      this.isPlaying = false;
+    this.playbackId++;
+    const source = this.currentSource;
+    this.currentSource = null;
+    this.isPlaying = false;
+    if (source) {
+      try { source.stop(); } catch { /* The source may have already ended. */ }
     }
   }
 

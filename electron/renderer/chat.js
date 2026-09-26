@@ -25,14 +25,27 @@ export class ChatManager {
   createMessageBubble(text, type) {
     const div = document.createElement('div');
     div.classList.add('message', type);
-    // Basic markdown replacement
-    let formattedText = text
-      .replace(/\n/g, '<br>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/`([^`]+)`/g, '<code style="background:rgba(0,0,0,0.3);padding:2px 4px;border-radius:4px;">$1</code>');
-    
-    div.innerHTML = formattedText;
+    // Render the small markdown subset with text nodes so model output cannot inject HTML.
+    const parts = String(text ?? '').split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\n)/g);
+    for (const part of parts) {
+      if (part === '\n') {
+        div.appendChild(document.createElement('br'));
+      } else if (part.startsWith('**') && part.endsWith('**')) {
+        const strong = document.createElement('strong');
+        strong.textContent = part.slice(2, -2);
+        div.appendChild(strong);
+      } else if (part.startsWith('*') && part.endsWith('*')) {
+        const emphasis = document.createElement('em');
+        emphasis.textContent = part.slice(1, -1);
+        div.appendChild(emphasis);
+      } else if (part.startsWith('`') && part.endsWith('`')) {
+        const code = document.createElement('code');
+        code.textContent = part.slice(1, -1);
+        div.appendChild(code);
+      } else if (part) {
+        div.appendChild(document.createTextNode(part));
+      }
+    }
     
     // Insert before thinking indicator if it exists
     if (this.thinkingIndicator.parentNode === this.messagesContainer) {
